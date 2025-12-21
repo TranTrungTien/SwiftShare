@@ -17,7 +17,10 @@ class AppsList extends StatefulWidget {
 
 class _AppsListState extends State<AppsList> {
   static const platform = MethodChannel('dev.abhi.photon');
-  Future<List<AppInfo>> future = InstalledApps.getInstalledApps(true, true);
+  Future<List<AppInfo>> future = InstalledApps.getInstalledApps(
+    excludeSystemApps: false,
+    withIcon: true,
+  );
   Map<String, String> appToFilePathMapping = {};
   List<AppInfo> apps = <AppInfo>[];
   List<String> paths = [];

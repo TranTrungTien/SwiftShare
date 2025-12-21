@@ -30,8 +30,9 @@ class DeviceService {
         },
       );
       broadcast = BonsoirBroadcast(service: bonsoirService!);
-      await broadcast!.ready;
-      await broadcast!.start();
+      if(broadcast!.isReady){
+        await broadcast!.start();
+      }
     } catch (e) {
       debugPrint("unable to advertise ${e.toString()}");
     }
@@ -46,12 +47,13 @@ class DeviceService {
   Future<List<BonsoirService?>> discover() async {
     Completer<List<BonsoirService?>> completer = Completer();
     discovery = BonsoirDiscovery(type: serviceType);
-    await discovery!.ready;
-    discovery!.eventStream!.listen((event) {
-      if (event.service != null) {
-        discoveredServices.add(event.service);
-      }
-    });
+    if(discovery!.isReady) {
+      discovery!.eventStream!.listen((event) {
+        if (event.service != null) {
+          discoveredServices.add(event.service);
+        }
+      });
+    }
     discovery!.start();
     Future.delayed(const Duration(milliseconds: 1000), () {
       discovery!.stop();
