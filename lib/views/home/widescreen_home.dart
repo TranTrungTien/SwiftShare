@@ -6,11 +6,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
 import 'package:photon/methods/handle_share.dart';
-import '../../services/photon_sender.dart';
-import '../apps_list.dart';
+import 'package:photon/services/photon_sender.dart';
+import 'package:photon/views/apps_list.dart';
 
 class WidescreenHome extends StatefulWidget {
-  const WidescreenHome({Key? key}) : super(key: key);
+  const WidescreenHome({super.key});
 
   @override
   State<WidescreenHome> createState() => _WidescreenHomeState();

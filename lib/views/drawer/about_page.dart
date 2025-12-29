@@ -2,11 +2,10 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:mailto/mailto.dart';
+import 'package:photon/components/constants.dart';
+import 'package:photon/components/dialogs.dart';
 import 'package:unicons/unicons.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-import '../../components/constants.dart';
-import '../../components/dialogs.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({Key? key}) : super(key: key);
@@ -77,13 +76,11 @@ class AboutPage extends StatelessWidget {
                   title: const Text('Github'),
                   subtitle: const Text('https://github.com/abhi16180/photon'),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    child: const Center(
-                        child:
-                            Text('Please consider supporting this project 💙')),
-                  ),
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Center(
+                      child:
+                          Text('Please consider supporting this project 💙')),
                 ),
                 InkWell(
                   onTap: () async {

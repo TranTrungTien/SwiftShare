@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class FileModel {
   String name;
   int size;

@@ -3,27 +3,25 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:photon/components/dialogs.dart';
+import 'package:photon/components/snackbar.dart';
+import 'package:photon/main.dart';
 import 'package:photon/methods/methods.dart';
 import 'package:photon/models/file_model.dart';
 import 'package:photon/models/sender_model.dart';
 import 'package:photon/models/share_error_model.dart';
 import 'package:photon/services/device_service.dart';
 import 'package:photon/views/share_ui/share_page.dart';
-import 'package:pointycastle/asymmetric/api.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:hive/hive.dart';
 import 'package:saf_stream/saf_stream.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:saf_util/saf_util_platform_interface.dart';
-import '../components/dialogs.dart';
-import '../components/snackbar.dart';
-import '../main.dart';
 import 'file_services.dart';
-import 'dart:typed_data';
 import 'dart:math';
 import 'package:basic_utils/basic_utils.dart';
-import 'package:crypto/crypto.dart';
 import 'package:convert/convert.dart';
+import 'package:crypto/crypto.dart';
 
 class PhotonSender {
   static late HttpServer _server;
@@ -36,7 +34,6 @@ class PhotonSender {
   static String _parentFolder = "";
   static DeviceService? deviceService;
   static SafUtil safUtils = SafUtil();
-  static final Box _box = Hive.box('appData');
   static bool isHTTPS = true;
   static Map<String, String> tokenMapping = {};
 
@@ -75,23 +72,24 @@ class PhotonSender {
     }
   }
 
-  static assignIP() async {
+  static Future<void> assignIP() async {
     //todo handle exception when no ip available
     //todo add option to choose ip from list
     List<String> ip = await getIP();
     if (ip.isNotEmpty) _address = ip.first;
   }
 
-  static handleSharing({
+  static Future<void> handleSharing({
     bool externalIntent = false,
     String extIntentType = "file",
     List<String> fileList = const <String>[],
     bool isRawText = false,
     bool isFolder = false,
   }) async {
+    if(nav.currentContext == null) return;
     Navigator.pop(nav.currentContext!);
     Map<String, dynamic> shareRespMap = await PhotonSender.share(
-        nav.currentContext,
+        nav.currentContext!,
         externalIntent: externalIntent,
         extIntentType: extIntentType,
         isRawText: isRawText,
@@ -100,8 +98,7 @@ class PhotonSender {
     ShareError shareErr = ShareError.fromMap(shareRespMap);
     switch (shareErr.hasError) {
       case true:
-        // ignore: use_build_context_synchronously
-        showSnackBar(nav.currentContext, '${shareErr.errorMessage}');
+        showSnackBar(nav.currentContext!, '${shareErr.errorMessage}');
         break;
 
       case false:
@@ -117,7 +114,7 @@ class PhotonSender {
   }
 
   static Future<Map<String, dynamic>> share(
-    context, {
+    BuildContext context, {
     bool externalIntent = false,
     String extIntentType = "file",
     List<String> fileList = const <String>[],
@@ -128,10 +125,13 @@ class PhotonSender {
     if (externalIntent) {
       // When user tries to share files opened / listed on external app
       // Photon will be opened along with intended files' paths
+      if(!context.mounted) return <String, dynamic>{};
+      Navigator.of(context).pop;
       return await shareFromExternalIntent(extIntentType, context);
     } else {
       if (isRawText) {
         // assign empty list to late init var _fileList
+        if(!context.mounted) return <String, dynamic>{};
         _fileList = [];
         Future<Map<String, dynamic>> res =
             _startServer(_fileList, context, isRawText: isRawText);
@@ -175,6 +175,9 @@ class PhotonSender {
                 isAPK: fileList.isNotEmpty);
             await storeSentDocumentHistory([selectedDirectory],
                 type: "directory");
+            if(!context.mounted) {
+              return <String, dynamic>{};
+            }
             Future<Map<String, dynamic>> res = _startServer(_fileList, context,
                 isRawText: isRawText, isFolder: isFolder);
             return res;
@@ -221,6 +224,8 @@ class PhotonSender {
     var secContext = genSecurityCtx();
     var certificate = secContext["certificate"];
     var privateKey = secContext["private_key"];
+    if(privateKey == null || certificate == null) return <String, dynamic>{};
+
     final serverSecurityContext = SecurityContext()
       ..useCertificateChainBytes(utf8.encode(certificate))
       ..usePrivateKeyBytes(utf8.encode(privateKey));
@@ -452,7 +457,7 @@ class PhotonSender {
     return await res;
   }
 
-  static closeServer(context) async {
+  static Future<void> closeServer(BuildContext context) async {
     try {
       await _server.close();
       await FileUtils.clearCache();
@@ -460,12 +465,13 @@ class PhotonSender {
         await deviceService!.stopAdvertising();
       }
     } catch (e) {
+      if(!context.mounted) return;
       showSnackBar(context, 'Server not started yet');
     }
   }
 
   //get details about server
-  static getServerInfo() {
+  static SenderModel getServerInfo() {
     var info = {
       'ip': _server.address.address,
       'port': _server.port,
@@ -484,7 +490,7 @@ class PhotonSender {
   static String get getPhotonLink => photonURL;
 
   // gen random cert for current user
-  static genSecurityCtx([AsymmetricKeyPair? keyPair]) {
+  static Map<String, String> genSecurityCtx([AsymmetricKeyPair? keyPair]) {
     keyPair ??= CryptoUtils.generateRSAKeyPair();
     final privateKey = keyPair.privateKey as RSAPrivateKey;
     final publicKey = keyPair.publicKey as RSAPublicKey;

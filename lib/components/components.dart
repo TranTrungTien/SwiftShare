@@ -1,11 +1,9 @@
-import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
+import 'package:photon/models/sender_model.dart';
 import 'package:unicons/unicons.dart';
-
-import '../models/sender_model.dart';
 import 'package:flutter/material.dart';
 
-infoList(
+List<Widget> infoList(
     SenderModel senderModel, double width, double height, bool sender, theme) {
   var iconList = [
     Padding(
@@ -17,7 +15,7 @@ infoList(
     ),
     if (!sender && senderModel.avatar != null) ...{
       Padding(
-          padding: EdgeInsets.only(left: 8.0),
+          padding: const EdgeInsets.only(left: 8.0),
           child: Image.memory(
             senderModel.avatar!,
             width: 24,

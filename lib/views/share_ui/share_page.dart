@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:photon/components/components.dart';
 import 'package:photon/components/constants.dart';
 import 'package:photon/components/dialogs.dart';
 import 'package:photon/controllers/controllers.dart';
@@ -11,13 +12,11 @@ import 'package:photon/models/sender_model.dart';
 import 'package:photon/services/photon_sender.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
-import '../../components/components.dart';
-
 class SharePage extends StatefulWidget {
   final bool? isRawText;
   final bool? isFolder;
 
-  const SharePage({Key? key, this.isRawText, this.isFolder}) : super(key: key);
+  const SharePage({super.key, this.isRawText, this.isFolder});
 
   @override
   State<SharePage> createState() => _SharePageState();

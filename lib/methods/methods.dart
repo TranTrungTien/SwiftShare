@@ -6,7 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:get/get_rx/src/rx_types/rx_types.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import '../controllers/controllers.dart';
+import 'package:photon/controllers/controllers.dart';
 
 String formatTime(int seconds) {
   List<String> timeList = Duration(seconds: seconds).toString().split(':');
@@ -39,7 +39,7 @@ Future<List<String>> getIP() async {
   return ipList;
 }
 
-getReceiverIP(ipList) {
+dynamic getReceiverIP(List<dynamic> ipList) {
   return ipList[0];
 }
 
@@ -53,7 +53,7 @@ int getRandomNumber() {
   return rnd.nextInt(1000000) + 1000000;
 }
 
-generatePercentageList(len) {
+void generatePercentageList(len) {
   var getInstance = GetIt.I<PercentageController>();
   getInstance.percentage = RxList.generate(len, (index) {
     return RxDouble(0.0);
@@ -143,7 +143,7 @@ Widget getFileIcon(String extn) {
   }
 }
 
-getStatusWidget(RxString status, idx) {
+Text getStatusWidget(RxString status, idx) {
   switch (status.value) {
     case "waiting":
       return const Text("Waiting");
@@ -156,10 +156,12 @@ getStatusWidget(RxString status, idx) {
       return const Text("Error");
     case "downloaded":
       return const Text("Completed");
+    default:
+      return const Text("");
   }
 }
 
-storeHistory(Box box, String savePath) {
+void storeHistory(Box box, String savePath) {
   if (box.get('fileInfo') == null) {
     box.put('fileInfo', []);
   }
@@ -196,23 +198,23 @@ Future<void> storeSentDocumentHistory(List<String?> docs,
   );
 }
 
-getSentFileHistory() async {
+Future<List> getSentFileHistory() async {
   Box box = await Hive.openBox('appData');
   List sentFilesHistory = box.get('sentHistory') as List;
   return sentFilesHistory;
 }
 
-getHistory() async {
+Future getHistory() async {
   var box = await Hive.openBox('appData');
   return box.get('fileInfo');
 }
 
-clearSentHistory() async {
+Future<void> clearSentHistory() async {
   var box = await Hive.openBox('appData');
   box.delete('sentHistory');
 }
 
-clearHistory() async {
+Future<void> clearHistory() async {
   Hive.openBox('appData').then((box) => box.delete('fileInfo')).catchError((e) {
     debugPrint(e.toString());
   });
@@ -229,7 +231,7 @@ String getDateString(DateTime date) {
   return dateString;
 }
 
-processReceiversData(Map<String, dynamic> newReceiverData) {
+void processReceiversData(Map<String, dynamic> newReceiverData) {
   var inst = GetIt.I.get<ReceiverDataController>();
   inst.receiverMap.addAll(
     {
@@ -245,7 +247,7 @@ processReceiversData(Map<String, dynamic> newReceiverData) {
   );
 }
 
-getEstimatedTime(receivedBits, totalBits, currentSpeed) {
+String getEstimatedTime(int receivedBits, totalBits, currentSpeed) {
   ///speed in [mega bits  x * 10^6 bits ]
   double estBits = (totalBits - receivedBits) / 1000000;
   int estTimeInInt = (estBits ~/ currentSpeed);
@@ -264,7 +266,7 @@ getEstimatedTime(receivedBits, totalBits, currentSpeed) {
   return 'About $hours h $mins m $seconds s left';
 }
 
-getErrorString() {
+String getErrorString() {
   final List<String> scanErrorLines = [
     "Lost in the digital wilderness? Ensure your sender and receiver are holding hands through a mobile hotspot or dancing to the same WiFi beat!",
     "Looks like your devices are playing hide and seek. Connect them through a mobile hotspot or let them share the same WiFi network.",

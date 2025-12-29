@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:hive/hive.dart';
 import 'package:lottie/lottie.dart';
+import 'package:photon/methods/handle_share.dart';
 import 'package:photon/services/photon_sender.dart';
-import '../../methods/handle_share.dart';
 
 class MobileHome extends StatefulWidget {
-  const MobileHome({Key? key}) : super(key: key);
+  const MobileHome({super.key});
 
   @override
   State<MobileHome> createState() => _MobileHomeState();
@@ -22,13 +22,13 @@ class _MobileHomeState extends State<MobileHome> {
   Box box = Hive.box('appData');
   TextEditingController rawTextController = TextEditingController();
 
-  getSharingOptions() {
+  List<Map<String, dynamic>> getSharingOptions() {
     List<Map<String, dynamic>> sharingOptions = [
       {
         "type": "Folder",
         "icon": SvgPicture.asset(
           "assets/icons/folder.svg",
-          colorFilter: ColorFilter.linearToSrgbGamma(),
+          colorFilter: const ColorFilter.linearToSrgbGamma(),
           height: 60,
         ),
       },
@@ -36,7 +36,7 @@ class _MobileHomeState extends State<MobileHome> {
         "type": "Files",
         "icon": SvgPicture.asset(
           "assets/icons/files.svg",
-          colorFilter: ColorFilter.srgbToLinearGamma(),
+          colorFilter: const ColorFilter.srgbToLinearGamma(),
           height: 60,
         ),
       },
@@ -44,7 +44,7 @@ class _MobileHomeState extends State<MobileHome> {
         "type": "Text",
         "icon": SvgPicture.asset(
           "assets/icons/texts.svg",
-          colorFilter: ColorFilter.linearToSrgbGamma(),
+          colorFilter: const ColorFilter.linearToSrgbGamma(),
           height: 60,
         ),
       },
@@ -54,7 +54,7 @@ class _MobileHomeState extends State<MobileHome> {
         "type": "Apps",
         "icon": SvgPicture.asset(
           "assets/icons/apps.svg",
-          colorFilter: ColorFilter.mode(Colors.white38, BlendMode.srcATop),
+          colorFilter: const ColorFilter.mode(Colors.white38, BlendMode.srcATop),
           height: 60,
         ),
       });
@@ -303,7 +303,7 @@ class _MobileHomeState extends State<MobileHome> {
         });
   }
 
-  shareText() async {
+  Future<void> shareText() async {
     await showDialog(
       context: context,
       builder: (context) {
@@ -313,7 +313,7 @@ class _MobileHomeState extends State<MobileHome> {
             children: [
               const Text("Share text"),
               IconButton(
-                icon: Icon(Icons.close),
+                icon: const Icon(Icons.close),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -367,7 +367,7 @@ class _MobileHomeState extends State<MobileHome> {
     );
   }
 
-  shareApps() async {
+  Future<void> shareApps() async {
     if (mounted) {
       await showDialog(
         context: context,

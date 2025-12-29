@@ -77,7 +77,7 @@ class _AppsListState extends State<AppsList> {
                       );
                     });
               },
-              icon: Icon(Icons.search))
+              icon: const Icon(Icons.search))
         ],
       ),
       body: FutureBuilder(
@@ -159,10 +159,10 @@ class ListTileState extends ChangeNotifier {
 
   ListTileState({required this.isSelected});
 
-  isSelect(i) {
+  void isSelect(int i) {
     isSelected[i] = !isSelected[i];
     notifyListeners();
   }
 
-  search() {}
+  void search() {}
 }

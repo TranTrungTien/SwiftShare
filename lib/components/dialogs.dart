@@ -1,23 +1,17 @@
-import 'dart:convert';
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
-import 'package:path/path.dart';
+import 'package:photon/app.dart';
+import 'package:photon/controllers/controllers.dart';
 import 'package:photon/main.dart';
-
+import 'package:photon/services/photon_sender.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart' as ulaunch;
 
-import '../app.dart';
-import '../controllers/controllers.dart';
-import '../services/photon_sender.dart';
-
 void privacyPolicyDialog(BuildContext context, String data) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
-  showDialog(
+  if (context.mounted) {
+    showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
@@ -47,10 +41,12 @@ void privacyPolicyDialog(BuildContext context, String data) async {
           ],
         );
       });
+  }
 }
 
-progressPageAlertDialog(BuildContext context) async {
+Future<void> progressPageAlertDialog(BuildContext context) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
+  if(!context.mounted) return;
   showDialog(
     context: context,
     builder: (context) {
@@ -82,9 +78,11 @@ progressPageAlertDialog(BuildContext context) async {
   );
 }
 
-progressPageWillPopDialog(context) async {
+Future<bool> progressPageWillPopDialog(BuildContext context) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
   bool willPop = false;
+  if(!context.mounted) return false;
+
   await showDialog(
     context: context,
     builder: (context) {
@@ -121,8 +119,9 @@ progressPageWillPopDialog(context) async {
   return willPop;
 }
 
-sharePageAlertDialog(BuildContext context) async {
+Future<void> sharePageAlertDialog(BuildContext context) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
+  if(!context.mounted) return;
   showDialog(
     context: context,
     builder: (context) {
@@ -141,6 +140,7 @@ sharePageAlertDialog(BuildContext context) async {
               await PhotonSender.closeServer(context);
               // ignore: use_build_context_synchronously
               GetIt.I.get<ReceiverDataController>().receiverMap.clear();
+              if(!context.mounted) return;
               Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const App()),
                   (route) => false);
@@ -153,9 +153,11 @@ sharePageAlertDialog(BuildContext context) async {
   );
 }
 
-sharePageWillPopDialog(context) async {
+Future<bool> sharePageWillPopDialog(BuildContext context) async {
   bool willPop = false;
   SharedPreferences prefInst = await SharedPreferences.getInstance();
+  
+  if(!context.mounted) return false;
   await showDialog(
     context: context,
     builder: (context) {
@@ -192,13 +194,13 @@ sharePageWillPopDialog(context) async {
   return willPop;
 }
 
-senderRequestDialog(
+Future<bool> senderRequestDialog(
   String username,
   String os,
 ) async {
   bool allowRequest = false;
   SharedPreferences prefInst = await SharedPreferences.getInstance();
-
+  if(nav.currentContext == null) return false;
   await showDialog(
       context: nav.currentContext!,
       builder: (context) {
@@ -231,8 +233,9 @@ senderRequestDialog(
   return allowRequest;
 }
 
-credits(context) async {
+Future<void> credits(BuildContext context) async {
   SharedPreferences prefInst = await SharedPreferences.getInstance();
+  if(!context.mounted) return;
   showDialog(
       context: context,
       builder: (context) {

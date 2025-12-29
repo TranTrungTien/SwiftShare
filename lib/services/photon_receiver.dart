@@ -7,12 +7,11 @@ import 'package:dio/io.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:hive/hive.dart';
-import 'package:photon/components/snackbar.dart';
+import 'package:photon/controllers/controllers.dart';
 import 'package:photon/methods/methods.dart';
 import 'package:photon/models/sender_model.dart';
 import 'package:photon/services/device_service.dart';
 import 'package:photon/services/file_services.dart';
-import '../controllers/controllers.dart';
 import 'package:get_it/get_it.dart';
 
 class PhotonReceiver {
@@ -47,7 +46,7 @@ class PhotonReceiver {
   }
 
   /// check if ip & port pair represent photon-server
-  static isPhotonServer(String ip, String port) async {
+  static Future<SenderModel> isPhotonServer(String ip, String port) async {
     dio.httpClientAdapter = IOHttpClientAdapter(
       createHttpClient: () {
         final SecurityContext scontext = SecurityContext();
@@ -81,12 +80,8 @@ class PhotonReceiver {
     for (var ele in list) {
       Map<String, dynamic> item = await ele;
       if (item.containsKey('host')) {
-        Future<dynamic> resp;
-        if ((resp = (isPhotonServer(
-                item['host'].toString(), item['port'].toString()))) !=
-            null) {
-          photonServers.add(await resp);
-        }
+        var resp = await isPhotonServer(item['host'].toString(), item['port'].toString());
+        photonServers.add(resp);
       }
     }
     list.clear();
@@ -102,7 +97,10 @@ class PhotonReceiver {
   }
 
   static Future<List<SenderModel>> scanV2() async {
-    DeviceService deviceService = DeviceService.getDeviceService();
+    DeviceService? deviceService = DeviceService.getDeviceService();
+    if (deviceService == null) {
+      return List.empty();
+    }
     List<BonsoirService?> discoveredServices = await deviceService.discover();
     List<Future<Map<String, dynamic>>> list = [];
     List<SenderModel> photonServers = [];
@@ -127,14 +125,10 @@ class PhotonReceiver {
         } else {
           _box.put("protocol_from_sender", "http");
         }
-        Future<dynamic> resp;
-        if ((resp = (isPhotonServer(
-                item['host'].toString(), item['port'].toString()))) !=
-            null) {
-          var val = await resp;
-          if (!photonServers.contains(val)) {
-            photonServers.add(val);
-          }
+        var resp = await isPhotonServer(item['host'].toString(), item['port'].toString());
+        var val = resp;
+        if (!photonServers.contains(val)) {
+          photonServers.add(val);
         }
       }
     }
@@ -148,7 +142,7 @@ class PhotonReceiver {
     return uniquePhotonServers;
   }
 
-  static isRequestAccepted(SenderModel senderModel) async {
+  static Future isRequestAccepted(SenderModel senderModel) async {
     String username = _box.get('username');
     var avatar = await rootBundle.load(_box.get('avatarPath'));
     var resp = await dio.get(
@@ -165,7 +159,7 @@ class PhotonReceiver {
     return senderRespData;
   }
 
-  static sendBackReceiverRealtimeData(SenderModel senderModel, token,
+  static void sendBackReceiverRealtimeData(SenderModel senderModel, token,
       {fileIndex = -1, isCompleted = true}) {
     try {
       dio.post(
@@ -181,11 +175,11 @@ class PhotonReceiver {
             },
           ));
     } catch (e) {
-      throw e;
+      rethrow;
     }
   }
 
-  static receiveText(SenderModel senderModel, int secretCode, token) async {
+  static Future<void> receiveText(SenderModel senderModel, int secretCode, token) async {
     RawTextController getInstance = GetIt.instance.get<RawTextController>();
     var resp = await dio.get(
         "${DeviceService.protocolFromSender}://${senderModel.ip}:4040/$secretCode/text",
@@ -196,7 +190,7 @@ class PhotonReceiver {
     getInstance.rawText.value = text;
   }
 
-  static receiveFolder(SenderModel senderModel, int secretCode,
+  static Future<void> receiveFolder(SenderModel senderModel, int secretCode,
       String? parentDirectory, token) async {
     PercentageController getInstance =
         GetIt.instance.get<PercentageController>();
@@ -250,7 +244,7 @@ class PhotonReceiver {
     }
   }
 
-  static receiveFiles(SenderModel senderModel, int secretCode, token) async {
+  static Future<void> receiveFiles(SenderModel senderModel, int secretCode, token) async {
     PercentageController getInstance =
         GetIt.instance.get<PercentageController>();
     //getting hiveObj
@@ -298,7 +292,7 @@ class PhotonReceiver {
     }
   }
 
-  static receive(SenderModel senderModel, int secretCode, String type,
+  static Future<void> receive(SenderModel senderModel, int secretCode, String type,
       {String? parentDirectory = "", String? token}) async {
     switch (type) {
       case "raw_text":
@@ -323,7 +317,7 @@ class PhotonReceiver {
     }
   }
 
-  static getFile(
+  static Future<void> getFile(
     String filePath,
     int fileIndex,
     String? token,

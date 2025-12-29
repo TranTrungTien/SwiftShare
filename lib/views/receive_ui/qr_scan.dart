@@ -1,11 +1,11 @@
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:photon/components/constants.dart';
 import 'package:photon/models/sender_model.dart';
+import 'package:photon/services/photon_receiver.dart';
 import 'package:photon/views/receive_ui/progress_page.dart';
 import 'package:simple_barcode_scanner/simple_barcode_scanner.dart';
-import '../../components/constants.dart';
-import '../../services/photon_receiver.dart';
 
 class QrReceivePage extends StatefulWidget {
   const QrReceivePage({
@@ -17,7 +17,7 @@ class QrReceivePage extends StatefulWidget {
 }
 
 class _QrReceivePageState extends State<QrReceivePage> {
-  _scan(BuildContext context) async {
+  Future<String?>? _scan(BuildContext context) async {
     if (context.mounted) {
       await Permission.camera.request();
       late String? resp;
@@ -103,7 +103,7 @@ class _QrReceivePageState extends State<QrReceivePage> {
     );
   }
 
-  handleQrReceive(link) async {
+  Future<void> handleQrReceive(link) async {
     try {
       String host = Uri.parse(link).host;
       int port = Uri.parse(link).port;

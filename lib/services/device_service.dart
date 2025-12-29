@@ -13,7 +13,7 @@ class DeviceService {
   List<BonsoirService?> discoveredServices = [];
   static final Box _box = Hive.box('appData');
 
-  static getDeviceService() {
+  static DeviceService? getDeviceService() {
     deviceService ??= DeviceService();
     return deviceService;
   }
@@ -64,12 +64,12 @@ class DeviceService {
     return completer.future;
   }
 
-  static get protocolFromSender {
+  static String get protocolFromSender {
     var protocol = _box.get("protocol_from_sender").toString();
     return protocol;
   }
 
-  static get serverProtocol {
+  static String get serverProtocol {
     bool httpsEnabled = _box.get("enable_https") as bool;
     return httpsEnabled ? "https" : "http";
   }

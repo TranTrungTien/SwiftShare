@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:photon/components/snackbar.dart';
 import 'package:photon/methods/methods.dart';
-import '../components/snackbar.dart';
-import '../views/receive_ui/qr_scan.dart';
 import 'package:open_settings_plus/open_settings_plus.dart';
+import 'package:photon/views/receive_ui/qr_scan.dart';
 
 class HandleShare {
   BuildContext context;
 
   HandleShare({required this.context});
 
-  onNormalScanTap() async {
+  Future<void> onNormalScanTap() async {
     getIP().then((value) async {
+      if(!context.mounted) return;
       if (value.isNotEmpty) {
         Navigator.of(context).pushNamed('/receivepage');
       } else {
@@ -25,8 +26,9 @@ class HandleShare {
     });
   }
 
-  onQrScanTap() {
+  void onQrScanTap() {
     getIP().then((value) async {
+      if(!context.mounted) return;
       if (value.isNotEmpty) {
         Navigator.of(context).push(
           MaterialPageRoute(

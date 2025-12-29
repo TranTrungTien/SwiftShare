@@ -4,16 +4,16 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_it/get_it.dart';
 import 'package:lottie/lottie.dart';
+import 'package:photon/components/constants.dart';
+import 'package:photon/components/dashboard.dart';
+import 'package:photon/components/dialogs.dart';
+import 'package:photon/components/progress_line.dart';
 import 'package:photon/controllers/controllers.dart';
+import 'package:photon/methods/methods.dart';
+import 'package:photon/models/sender_model.dart';
+import 'package:photon/services/file_services.dart';
 import 'package:photon/services/photon_receiver.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import '../../components/constants.dart';
-import '../../components/dashboard.dart';
-import '../../components/dialogs.dart';
-import '../../components/progress_line.dart';
-import '../../methods/methods.dart';
-import '../../models/sender_model.dart';
-import '../../services/file_services.dart';
 
 class ProgressPage extends StatefulWidget {
   final SenderModel? senderModel;
@@ -23,13 +23,13 @@ class ProgressPage extends StatefulWidget {
   final String? token;
 
   const ProgressPage({
-    Key? key,
+    super.key,
     required this.senderModel,
     required this.secretCode,
     required this.dataType,
     this.parentDirectory,
     this.token,
-  }) : super(key: key);
+  });
 
   @override
   State<ProgressPage> createState() => _ProgressPageState();
@@ -196,7 +196,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                                                       .rawText
                                                                       .value),
                                                         );
-                                                        if (mounted) {
+                                                        if (context.mounted) {
                                                           ScaffoldMessenger.of(
                                                                   context)
                                                               .showSnackBar(
@@ -462,7 +462,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                                                       720
                                                                   ? 18
                                                                   : 10),
-                                                          child: Icon(Icons
+                                                          child: const Icon(Icons
                                                               .done_rounded))
                                                     },
                                                   ],
@@ -529,7 +529,7 @@ class _ProgressPageState extends State<ProgressPage> {
                                   await FileUtils.saveTextFile(
                                       rawTextController.rawText.value,
                                       fileNameController.text);
-                                  if (mounted) {
+                                  if (context.mounted) {
                                     Navigator.of(context).pop();
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(

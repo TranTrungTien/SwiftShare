@@ -1,8 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-
-import '../../models/github_release.dart';
+import 'package:photon/models/github_release.dart';
 import 'package:url_launcher/url_launcher.dart' as ulaunch;
 
 class ReleaseNotesScreen extends StatelessWidget {
@@ -10,10 +9,10 @@ class ReleaseNotesScreen extends StatelessWidget {
   final String repo;
 
   const ReleaseNotesScreen({
-    Key? key,
+    super.key,
     required this.owner,
     required this.repo,
-  }) : super(key: key);
+  });
 
   Future<List<GitHubRelease>> fetchReleases() async {
     final url = Uri.parse('https://api.github.com/repos/$owner/$repo/releases');
@@ -53,7 +52,7 @@ class ReleaseNotesScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final release = releases[index];
                 return ListTile(
-                  trailing: Icon(Icons.link),
+                  trailing: const Icon(Icons.link),
                   title: Text(release.name),
                   subtitle: Text(
                     release.body,

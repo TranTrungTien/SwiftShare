@@ -19,7 +19,7 @@ List<String> textFileExtensions = [
   "appcache" // Cache manifest
 ];
 
-handleSharingIntent() async {
+Future<(bool, String)> handleSharingIntent() async {
   List<SharedMediaFile> initialMediaList =
       await ReceiveSharingIntent.instance.getInitialMedia();
   if (initialMediaList.isEmpty) {
@@ -38,7 +38,7 @@ handleSharingIntent() async {
   return (true, type == SharedMediaType.text ? "raw_text" : "file");
 }
 
-isRawText(SharedMediaFile sharedMediaFile) {
+bool isRawText(SharedMediaFile sharedMediaFile) {
   var extn = sharedMediaFile.path.split(".").last;
   return (!textFileExtensions.contains(extn));
 }

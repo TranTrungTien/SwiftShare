@@ -7,12 +7,11 @@ import 'package:flutter_svg/svg.dart';
 import 'package:hive/hive.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:lottie/lottie.dart';
-import 'package:photon/components/snackbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import "package:permission_handler/permission_handler.dart";
 
 class IntroPage extends StatefulWidget {
-  const IntroPage({Key? key}) : super(key: key);
+  const IntroPage({super.key});
 
   @override
   State<IntroPage> createState() => _IntroPageState();
@@ -41,6 +40,7 @@ class _IntroPageState extends State<IntroPage> {
                   SharedPreferences prefInst =
                       await SharedPreferences.getInstance();
                   prefInst.setBool('isIntroRead', true);
+                  if(!context.mounted) return;
                   Navigator.of(context).pushReplacementNamed('/home');
                 } else {
                   SharedPreferences prefInst =

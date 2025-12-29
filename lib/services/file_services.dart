@@ -9,12 +9,10 @@ import 'package:hive/hive.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as path;
 import 'package:path_provider/path_provider.dart';
-
 import 'package:photon/models/file_model.dart';
+import 'package:photon/models/sender_model.dart';
 import 'package:saf_util/saf_util.dart';
 import 'package:saf_util/saf_util_platform_interface.dart';
-
-import '../models/sender_model.dart';
 import 'device_service.dart';
 
 class FileUtils {
@@ -36,7 +34,7 @@ class FileUtils {
 
   ///This typically relates to cached files that are stored in the cache directory
   ///Works only for android and ios
-  static clearCache() async {
+  static Future<void> clearCache() async {
     if (Platform.isAndroid || Platform.isIOS) {
       var appDir = (await getTemporaryDirectory()).path;
       Directory(appDir).delete(recursive: true);
@@ -64,7 +62,7 @@ class FileUtils {
         {'name': fileName, 'size': size, 'file': file, 'extension': type});
   }
 
-  static Future<FileModel> extractFileDataWithSAF(path,
+  static Future<FileModel> extractFileDataWithSAF(String path,
       {bool isApk = false}) async {
     SafDocumentFile? safDoc = await safUtils.documentFileFromUri(path, false);
     int size = safDoc!.length;
@@ -165,7 +163,7 @@ class FileUtils {
     return fileNames;
   }
 
-  static editDirectoryPath(String path) {
+  static void editDirectoryPath(String path) {
     var box = Hive.box('appData');
     box.put('directoryPath', path);
   }
@@ -217,7 +215,7 @@ class FileUtils {
     return directory;
   }
 
-  static saveTextFile(String content, fileName) async {
+  static Future<bool> saveTextFile(String content, fileName) async {
     Directory dir = await getSaveDirectory();
     final String filePath = p.join(
       dir.path,
@@ -231,13 +229,12 @@ class FileUtils {
     }
   }
 
-  static Future<String> getTextFilePath(fileName) async {
+  static Future<String> getTextFilePath(String fileName) async {
     return '${(await getSaveDirectory()).path}${Platform.pathSeparator}$fileName.txt';
   }
 
   static Future<String> getDirectorySavePath(
       SenderModel senderModel, String directoryPath) async {
-    // ignore: unused_local_variable
     String? savePath;
     Directory? directory;
     directory = await getSaveDirectory();
@@ -302,7 +299,7 @@ class FileUtils {
     return uris;
   }
 
-  static decodeRealPathFromURI(String uriString) {
+  static String decodeRealPathFromURI(String uriString) {
     final uri = Uri.parse(uriString);
     const String splitKey = "primary:";
     final decodedPath = Uri.decodeComponent(uri.path);
